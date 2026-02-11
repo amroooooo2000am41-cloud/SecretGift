@@ -29,6 +29,163 @@
             position: relative;
         }
 
+        /* Password Screen */
+        .password-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, var(--deep-rose) 0%, var(--midnight) 70%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .password-screen.hidden {
+            opacity: 0;
+            transform: scale(1.2);
+            pointer-events: none;
+        }
+
+        .password-box {
+            background: rgba(26, 22, 37, 0.8);
+            border: 2px solid var(--rose-gold);
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(183, 110, 121, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .password-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: var(--shimmer);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .password-subtitle {
+            font-size: 1.1rem;
+            color: var(--cream);
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.5rem;
+            font-family: 'Cormorant Garamond', serif;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--rose-gold);
+            border-radius: 50px;
+            color: var(--cream);
+            text-align: center;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--shimmer);
+            box-shadow: 0 0 20px rgba(255, 215, 160, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .password-input::placeholder {
+            color: rgba(255, 245, 240, 0.5);
+        }
+
+        .password-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--rose-gold) 0%, var(--deep-rose) 100%);
+            color: var(--cream);
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            padding: 15px 30px;
+            border: 2px solid var(--shimmer);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 30px rgba(183, 110, 121, 0.4);
+        }
+
+        .password-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(183, 110, 121, 0.6);
+        }
+
+        .password-submit:active {
+            transform: translateY(0);
+        }
+
+        .password-error {
+            color: #ff6b6b;
+            font-size: 1rem;
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .password-error.show {
+            opacity: 1;
+        }
+
+        .main-site {
+            display: none;
+        }
+
+        .main-site.unlocked {
+            display: block;
+        }
+
+        @media screen and (max-width: 768px) {
+            .password-box {
+                padding: 40px 30px;
+            }
+
+            .password-icon {
+                font-size: 3rem;
+            }
+
+            .password-title {
+                font-size: 1.5rem;
+            }
+
+            .password-subtitle {
+                font-size: 1rem;
+            }
+
+            .password-input {
+                font-size: 1.3rem;
+                padding: 12px 18px;
+            }
+
+            .password-submit {
+                font-size: 1.1rem;
+                padding: 12px 25px;
+            }
+        }
+
         /* Animated starry background */
         .stars {
             position: fixed;
@@ -1301,6 +1458,28 @@
     </style>
 </head>
 <body>
+    <!-- Password Protection Screen -->
+    <div class="password-screen" id="passwordScreen">
+        <div class="password-box">
+            <div class="password-icon">🔒</div>
+            <h1 class="password-title">Enter Password</h1>
+            <p class="password-subtitle">This page is protected</p>
+            <input 
+                type="password" 
+                class="password-input" 
+                id="passwordInput" 
+                placeholder="••••"
+                maxlength="10"
+                autocomplete="off"
+            >
+            <button class="password-submit" id="passwordSubmit">Unlock</button>
+            <div class="password-error" id="passwordError">Incorrect password. Try again!</div>
+        </div>
+    </div>
+
+    <!-- Main Site Content -->
+    <div class="main-site" id="mainSite">
+
     <!-- Start Screen -->
     <div class="start-screen" id="startScreen">
         <h1>Valentine's Special For Salomty ❤️❤️</h1>
@@ -1729,6 +1908,71 @@
             musicControl.classList.remove('playing');
         });
     </script>
+
+    </div>
+
+    <script>
+        // Password protection
+        const passwordScreen = document.getElementById('passwordScreen');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordSubmit = document.getElementById('passwordSubmit');
+        const passwordError = document.getElementById('passwordError');
+        const mainSite = document.getElementById('mainSite');
+        
+        const correctPassword = '249';
+
+        function checkPassword() {
+            const enteredPassword = passwordInput.value;
+            
+            if (enteredPassword === correctPassword) {
+                // Correct password
+                passwordError.classList.remove('show');
+                passwordScreen.classList.add('hidden');
+                
+                setTimeout(() => {
+                    passwordScreen.style.display = 'none';
+                    mainSite.classList.add('unlocked');
+                }, 1000);
+            } else {
+                // Wrong password
+                passwordError.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.style.borderColor = '#ff6b6b';
+                
+                // Shake animation
+                passwordInput.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    passwordInput.style.animation = '';
+                    passwordInput.style.borderColor = 'var(--rose-gold)';
+                }, 500);
+                
+                setTimeout(() => {
+                    passwordError.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        passwordSubmit.addEventListener('click', checkPassword);
+        
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Auto-focus on password input
+        passwordInput.focus();
+
+        // Shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+                20%, 40%, 60%, 80% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
-
